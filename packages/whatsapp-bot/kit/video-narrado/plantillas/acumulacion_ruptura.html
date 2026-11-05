@@ -1,0 +1,66 @@
+<!doctype html>
+<!-- PLANTILLA «acumulacion_ruptura» · piezas (excusas, obstáculos) que caen y forman un muro; una flecha lo atraviesa. -->
+<html
+  data-composition-variables='[
+    {"id":"numero","type":"number","label":"Número de recordatorio (0 = sin número)","default":8},
+    {"id":"pieza_repetida","type":"string","label":"Texto de cada pieza","default":"un motivo más para esperar"},
+    {"id":"ruptura","type":"string","label":"La frase que rompe el muro","default":"Ninguna decisión te promete acertar"},
+    {"id":"t1","type":"number","label":"Inicio frase 2 (s)","default":4},
+    {"id":"t2","type":"number","label":"Inicio última frase (s)","default":4},
+    {"id":"dur","type":"number","label":"Duración escena (s)","default":8}
+  ]'
+>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        @font-face { font-family: "Jost"; src: url("public/fonts/Jost-var.ttf") format("truetype"); font-weight: 100 900; }
+        #root[data-composition-id="__ID__"] { position: absolute; inset: 0; font-family: "Jost", sans-serif; color: #fff; }
+        [data-composition-id="__ID__"] .kicker { position: absolute; left: 96px; top: 300px; font-size: 34px; font-weight: 600; letter-spacing: .14em; color: #d4e6a5; }
+        [data-composition-id="__ID__"] .muro { position: absolute; left: 96px; right: 96px; top: 400px; height: 800px; clip-path: inset(-20px -96px 0 -96px); } /* lo que vuela al romperse no tapa la cabecera ni el remate */
+        [data-composition-id="__ID__"] .ladrillo { position: absolute; width: 430px; height: 92px; border-radius: 14px; background: #262a27; border: 2px solid #343935; color: #8d928e; font-size: 28px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 18px; line-height: 1.1; }
+        [data-composition-id="__ID__"] .flecha { position: absolute; left: 50%; top: 0; width: 40px; height: 900px; margin-left: -20px; display: block; }
+        [data-composition-id="__ID__"] .remate { position: absolute; left: 96px; right: 96px; top: 1250px; font-size: 66px; font-weight: 600; line-height: 1.12; }
+      </style>
+      <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
+        <div class="kicker" id="__ID__-kicker"></div>
+        <div class="muro" id="__ID__-muro"></div>
+        <svg class="flecha" id="__ID__-flecha" viewBox="0 0 40 900"><path d="M20 900 V40" stroke="#d4e6a5" stroke-width="12" stroke-linecap="round"/><path d="M2 52 L20 8 L38 52 Z" fill="#d4e6a5"/></svg>
+        <div class="remate" id="__ID__-remate"></div>
+      </div>
+      <script>
+        (function () {
+          const ID = "__ID__";
+          const $ = (k) => document.getElementById(ID + "-" + k);
+          const v = window.__hyperframes.getVariables();
+          const n = Number(v.numero) || 0;
+          $("kicker").textContent = n ? "RECORDATORIO " + String(n).padStart(2, "0") : "";
+          $("remate").textContent = v.ruptura || "";
+          // Muro: 7 hileras de 2 ladrillos, desplazadas como un muro de verdad; se construye de abajo arriba.
+          const muro = $("muro"), FILAS = 7, ALTO = 104, piezas = [];
+          for (let f = 0; f < FILAS; f++) for (let c = 0; c < 2; c++) {
+            const b = document.createElement("div"); b.className = "ladrillo"; b.textContent = v.pieza_repetida || "";
+            b.style.left = c * 458 + "px"; // 2 por hilera: 430 px + 28 px de junta = 888 px de ancho útil
+            b.style.top = 800 - (f + 1) * ALTO + "px";
+            muro.appendChild(b); piezas.push(b);
+          }
+          const t2 = Number(v.t2) || 4, dur = Number(v.dur) || 8;
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo($("kicker"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.05);
+          // Cada «motivo más» cae y se apila mientras se habla de pensar demasiado.
+          const ritmo = Math.max(0.12, (t2 - 0.8) / piezas.length);
+          piezas.forEach((b, i) => tl.fromTo(b, { y: -700, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "bounce.out" }, 0.3 + i * ritmo));
+          // La flecha atraviesa el muro y los ladrillos del centro saltan.
+          const fl = $("flecha");
+          tl.fromTo(fl, { y: 1400, opacity: 0 }, { y: 300, opacity: 1, duration: 0.55, ease: "power3.in" }, t2 - 0.3);
+          piezas.forEach((b, i) => {
+            const lado = i % 2 ? 1 : -1;
+            tl.to(b, { x: lado * (160 + (i % 3) * 40), y: -120 - (i % 4) * 30, rotation: lado * (12 + (i % 5) * 6), opacity: 0.15, duration: 0.7, ease: "power2.out" }, t2 + 0.15);
+          });
+          tl.fromTo($("remate"), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, t2 + 0.2);
+          window.__timelines[ID] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

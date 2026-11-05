@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "formato": "1080x1920",
+  "idioma": "es-ES",
+  "marca": {
+    "nombre": "ingeniero binario",
+    "usuario": "@ingenierobinario",
+    "colores": {
+      "fondo": "#111312",
+      "texto": "#FFFFFF",
+      "acento": "#D4E6A5",
+      "secundario": "#9A9E9A"
+    },
+    "tipografia": "Jost",
+    "foto": "public/autor.png"
+  },
+  "musica": {
+    "calma": "Dream Culture",
+    "impulso": "Wallpaper"
+  },
+  "escenas": [
+    {
+      "plantilla": "gancho_foto_sello",
+      "campos": {
+        "foto": "public/autor.png",
+        "sello_repetido": "MAÑANA",
+        "sello_final": "HOY",
+        "titular": "9 recordatorios"
+      },
+      "narracion": "¿Cuántas veces has dicho «mañana empiezo»? Guarda estos nueve recordatorios para la próxima vez.",
+      "energia": "tension"
+    },
+    {
+      "plantilla": "comparacion",
+      "campos": {
+        "numero": 1,
+        "a": {
+          "etiqueta": "DECIDIR",
+          "visual": "cronometro",
+          "velocidad": "rapida"
+        },
+        "b": {
+          "etiqueta": "RESULTADOS",
+          "visual": "barra",
+          "velocidad": "lenta"
+        },
+        "desenlace": "Confundirlas te cuesta años"
+      },
+      "narracion": "Uno. Las decisiones piden rapidez… y los resultados, paciencia. Confundirlas te puede costar años.",
+      "energia": "tension",
+      "anclas": {
+        "t1": "resultados",
+        "t2": "Confundirlas"
+      }
+    },
+    {
+      "plantilla": "contador",
+      "campos": {
+        "numero": 2,
+        "desde": 1,
+        "hasta": 213,
+        "etiqueta": "intentos que no ves",
+        "visual": "nota",
+        "remate": "Date más intentos"
+      },
+      "narracion": "Dos. De un músico recuerdas sus éxitos, no los cientos de intentos de antes. Date más intentos.",
+      "energia": "calma",
+      "anclas": {
+        "t1": "cientos",
+        "t2": "Date"
+      }
+    },
+    {
+      "plantilla": "carrera",
+      "campos": {
+        "numero": 3,
+        "lento": {
+          "etiqueta": "TALENTO"
+        },
+        "rapido": {
+          "etiqueta": "EMPEZAR"
+        },
+        "remate": "Lo que sabes solo cuenta si lo usas"
+      },
+      "narracion": "Tres. Con menos talento puedes llegar más lejos, solo por atreverte a empezar. Lo que sabes solo cuenta si lo usas.",
+      "energia": "impulso"
+    },
+    {
+      "plantilla": "repeticion_excepcion",
+      "campos": {
+        "numero": 4,
+        "frase_repetida": "¿y si sale mal?",
+        "frase_destacada": "¿y si sale bien?"
+      },
+      "narracion": "Cuatro. Has ensayado mil veces todo lo que podría salir mal. Ensaya al menos una que sale bien.",
+      "energia": "calma"
+    },
+    {
+      "plantilla": "comparacion",
+      "campos": {
+        "numero": 5,
+        "a": {
+          "etiqueta": "LOS DEMÁS",
+          "visual": "pedestal"
+        },
+        "b": {
+          "etiqueta": "TÚ",
+          "visual": "lupa"
+        },
+        "desenlace": "Te falta darte permiso"
+      },
+      "narracion": "Cinco. A los demás los subes a un pedestal… y a ti te miras con lupa. Quizá no te falta capacidad: te falta darte permiso.",
+      "energia": "tension",
+      "anclas": {
+        "t1": "ti",
+        "t2": "Quiz?"
+      }
+    },
+    {
+      "plantilla": "frase_corregida",
+      "campos": {
+        "numero": 6,
+        "frase": "PUEDE salir mal",
+        "palabra_tachada": "PUEDE",
+        "correccion": "también puede salir bien"
+      },
+      "narracion": "Seis. Que algo pueda salir mal no significa que vaya a salir mal. También tienes motivos para apostar por ti.",
+      "energia": "impulso"
+    },
+    {
+      "plantilla": "destacado_en_grupo",
+      "campos": {
+        "numero": 7,
+        "etiqueta_grupo": "lo habitual",
+        "objeciones": [
+          "¿no es demasiado?",
+          "¿para qué?",
+          "eso no es para ti"
+        ],
+        "remate": "No necesitas que todos lo entiendan"
+      },
+      "narracion": "Siete. Si haces algo fuera de lo habitual, a alguien le parecerá demasiado. No necesitas que todo el mundo lo entienda.",
+      "energia": "impulso"
+    },
+    {
+      "plantilla": "acumulacion_ruptura",
+      "campos": {
+        "numero": 8,
+        "pieza_repetida": "un motivo más para esperar",
+        "ruptura": "Ninguna decisión te promete acertar"
+      },
+      "narracion": "Ocho. Pensar mucho tiene trampa: siempre encuentras un motivo más para esperar. Y ninguna decisión te promete acertar.",
+      "energia": "tension"
+    },
+    {
+      "plantilla": "contador",
+      "campos": {
+        "numero": 9,
+        "desde": 0,
+        "hasta": 1,
+        "etiqueta": "persona que cree en tu proyecto",
+        "destacado": "tú",
+        "visual": "paso",
+        "remate": "Basta para dar el primer paso"
+      },
+      "narracion": "Nueve. Al principio, quizá solo una persona crea en tu proyecto: tú. Y eso basta para dar el primer paso.",
+      "energia": "climax",
+      "anclas": {
+        "t1": "una",
+        "t2": "Y"
+      }
+    },
+    {
+      "plantilla": "cierre_marca",
+      "campos": {
+        "sello_final": "HOY",
+        "pedir_compartir": "Envíaselo a alguien que lleva tiempo dudando",
+        "firma": "ingeniero binario",
+        "usuario": "@ingenierobinario"
+      },
+      "narracion": "Envíaselo a alguien que lleva demasiado tiempo dudando. Y si quieres saber más sobre IA y tecnología, síguenos en Ingeniero Binario.",
+      "energia": "calma"
+    }
+  ]
+}

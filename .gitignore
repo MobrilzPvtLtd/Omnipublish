@@ -1,0 +1,37 @@
+node_modules/
+# Utillaje local de agentes: nunca en este repositorio.
+.claude/
+.codex/
+.mcp.json
+dist/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.tmp/
+.capturas-funnels/
+coverage/
+.gstack/
+
+# dev-only (no commitear)
+render-preview.mjs
+preview-harness.html
+check-panel.mjs
+# excepción: el script portado vive en packages/whatsapp-bot/scripts (tooling).
+!packages/whatsapp-bot/scripts/check-panel.mjs
+shot-*.png
+shot-*.txt
+
+# sesión del panel que consumen check-responsive*.mjs (contiene db_session)
+cookie.txt
+packages/*/cookie.txt
+# informes de los verificadores visuales
+packages/whatsapp-bot/scripts/auditoria.json
+packages/whatsapp-bot/scripts/barrido.json
+# auditorías de seguridad: no se suben al repo
+security-audit-findings.json
+
+# tarro de cookies de curl con una sesion REAL del panel de produccion
+lm_cj.txt
+*.cj.txt

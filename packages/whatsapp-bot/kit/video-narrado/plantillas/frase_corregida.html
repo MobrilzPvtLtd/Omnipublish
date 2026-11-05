@@ -1,0 +1,61 @@
+<!doctype html>
+<!-- PLANTILLA «frase_corregida» · una creencia en grande; se tacha la palabra que engaña y aparece la corrección. -->
+<html
+  data-composition-variables='[
+    {"id":"numero","type":"number","label":"Número de recordatorio (0 = sin número)","default":6},
+    {"id":"frase","type":"string","label":"Creencia","default":"PUEDE salir mal"},
+    {"id":"palabra_tachada","type":"string","label":"Palabra a tachar","default":"PUEDE"},
+    {"id":"correccion","type":"string","label":"Corrección","default":"también puede salir bien"},
+    {"id":"t1","type":"number","label":"Inicio frase 2 (s)","default":3.5},
+    {"id":"t2","type":"number","label":"Inicio última frase (s)","default":3.5},
+    {"id":"dur","type":"number","label":"Duración escena (s)","default":7}
+  ]'
+>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        @font-face { font-family: "Jost"; src: url("public/fonts/Jost-var.ttf") format("truetype"); font-weight: 100 900; }
+        #root[data-composition-id="__ID__"] { position: absolute; inset: 0; font-family: "Jost", sans-serif; color: #fff; }
+        [data-composition-id="__ID__"] .kicker { position: absolute; left: 96px; top: 300px; font-size: 34px; font-weight: 600; letter-spacing: .14em; color: #d4e6a5; }
+        [data-composition-id="__ID__"] .frase { position: absolute; left: 96px; right: 96px; top: 520px; font-size: 128px; font-weight: 700; line-height: 1.02; letter-spacing: -.02em; }
+        [data-composition-id="__ID__"] .tachable { position: relative; display: inline-block; }
+        [data-composition-id="__ID__"] .raya { position: absolute; left: -6px; right: -6px; top: 52%; height: 14px; border-radius: 7px; background: #e0614f; transform-origin: 0% 50%; display: block; }
+        [data-composition-id="__ID__"] .corr { position: absolute; left: 96px; right: 96px; top: 960px; font-size: 84px; font-weight: 600; line-height: 1.08; color: #d4e6a5; }
+        [data-composition-id="__ID__"] .w { display: inline-block; margin-right: .26em; }
+      </style>
+      <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
+        <div class="kicker" id="__ID__-kicker"></div>
+        <div class="frase" id="__ID__-frase"></div>
+        <div class="corr" id="__ID__-corr"></div>
+      </div>
+      <script>
+        (function () {
+          const ID = "__ID__";
+          const $ = (k) => document.getElementById(ID + "-" + k);
+          const v = window.__hyperframes.getVariables();
+          const n = Number(v.numero) || 0;
+          $("kicker").textContent = n ? "RECORDATORIO " + String(n).padStart(2, "0") : "";
+          const e = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+          const frase = String(v.frase || ""), tachar = String(v.palabra_tachada || "");
+          const i = tachar ? frase.indexOf(tachar) : -1;
+          $("frase").innerHTML = i < 0 ? e(frase)
+            : e(frase.slice(0, i)) + '<span class="tachable" id="' + ID + '-tach">' + e(tachar) + '<i class="raya" id="' + ID + '-raya"></i></span>' + e(frase.slice(i + tachar.length));
+          $("corr").innerHTML = String(v.correccion || "").split(/\s+/).filter(Boolean).map((w) => '<span class="w">' + e(w) + "</span>").join("");
+          const t1 = Number(v.t1) || 3.5, t2 = Math.max(t1, Number(v.t2) || 3.5);
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo($("kicker"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.05);
+          tl.fromTo($("frase"), { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.2);
+          // A mitad de la 1.ª frase («no significa que vaya a…»): se tacha.
+          const tTachar = Math.min(t1 - 0.3, Math.max(1.4, t1 * 0.62));
+          if ($("raya")) {
+            tl.fromTo($("raya"), { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, tTachar);
+            tl.to($("tach"), { opacity: 0.45, duration: 0.3 }, tTachar + 0.3);
+          }
+          tl.fromTo($("corr").children, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.12, ease: "power3.out" }, Math.max(tTachar + 0.6, t2 - 0.6));
+          window.__timelines[ID] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

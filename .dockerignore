@@ -1,0 +1,44 @@
+node_modules
+**/node_modules
+**/dist
+.git
+# Configuración local de agentes y worktrees (puede contener credenciales).
+.claude
+.codex
+.mcp.json
+wt-codex-*
+.worktrees
+
+# Variables, llaves y sesiones locales: nunca forman parte del contexto de build.
+.env
+.env.*
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/CREDENCIALES.md
+**/cookie.txt
+**/cookies.json
+**/lm_cj.txt
+**/*.cj.txt
+
+# Perfiles de navegador, pruebas y entregas; se conservan src, assets y JSON de uso real.
+.tmp
+**/.tmp
+**/.gstack
+**/coverage
+**/test
+**/test-results
+**/playwright-report
+**/shot-*.png
+**/shot-*.txt
+**/*-ENTREGA.md
+**/security-audit-findings.json
+packages/whatsapp-bot/scripts/auditoria.json
+packages/whatsapp-bot/scripts/barrido.json
+*.log
+**/*.log
+# Evidencias locales de auditoría: pueden incluir sesiones sintéticas y volcados.
+evidencias
+seguridad-*.json
+audit-dependencias.json

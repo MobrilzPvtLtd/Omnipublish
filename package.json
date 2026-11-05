@@ -1,0 +1,17 @@
+{
+  "name": "digital-business-stack",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Business Stack — imagen desplegable de la instancia de un cliente",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace packages/whatsapp-bot",
+    "build": "npm run build --workspace packages/whatsapp-bot",
+    "start": "npm run start --workspace packages/whatsapp-bot"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

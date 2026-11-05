@@ -1,0 +1,70 @@
+<!doctype html>
+<!-- PLANTILLA «cierre_marca» · se arranca la hoja del calendario («MAÑANA») y queda «HOY»; pedir compartir; firma + mascota. -->
+<html
+  data-composition-variables='[
+    {"id":"sello_repetido","type":"string","label":"Hoja que se arranca","default":"MAÑANA"},
+    {"id":"sello_final","type":"string","label":"Lo que queda","default":"HOY"},
+    {"id":"pedir_compartir","type":"string","label":"Pedir compartir","default":"Envíaselo a alguien que lleva tiempo dudando"},
+    {"id":"firma","type":"string","label":"Firma","default":"ingeniero binario"},
+    {"id":"usuario","type":"string","label":"Usuario","default":"@ingenierobinario"},
+    {"id":"mascota","type":"string","label":"Mascota/logo (ruta, opcional)","default":"public/mascota.png"},
+    {"id":"t1","type":"number","label":"Inicio frase 2 (s)","default":3.4},
+    {"id":"t2","type":"number","label":"Inicio última frase (s)","default":3.4},
+    {"id":"dur","type":"number","label":"Duración escena (s)","default":8}
+  ]'
+>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        @font-face { font-family: "Jost"; src: url("public/fonts/Jost-var.ttf") format("truetype"); font-weight: 100 900; }
+        #root[data-composition-id="__ID__"] { position: absolute; inset: 0; font-family: "Jost", sans-serif; color: #fff; }
+        [data-composition-id="__ID__"] .cal { position: absolute; left: 290px; top: 360px; width: 500px; height: 540px; border-radius: 34px; background: #f3f4f1; color: #111312; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,.5); }
+        [data-composition-id="__ID__"] .cal-top { height: 100px; background: #d4e6a5; }
+        [data-composition-id="__ID__"] .hoja { position: absolute; left: 0; right: 0; top: 100px; bottom: 0; display: flex; align-items: center; justify-content: center; background: #f3f4f1; transform-origin: 50% 0%; }
+        [data-composition-id="__ID__"] .viejo { font-size: 78px; font-weight: 800; color: #b33a2f; border: 8px solid #b33a2f; border-radius: 14px; padding: 4px 20px; transform: rotate(-12deg); }
+        [data-composition-id="__ID__"] .hoy { font-size: 170px; font-weight: 800; letter-spacing: -.03em; color: #111312; }
+        [data-composition-id="__ID__"] .pide { position: absolute; left: 96px; right: 96px; top: 980px; font-size: 56px; font-weight: 600; line-height: 1.15; text-align: center; }
+        [data-composition-id="__ID__"] .firma { position: absolute; left: 96px; right: 96px; top: 1230px; display: flex; align-items: center; justify-content: center; gap: 28px; }
+        [data-composition-id="__ID__"] .masc { width: 150px; height: 180px; object-fit: contain; display: block; }
+        [data-composition-id="__ID__"] .fn { font-size: 54px; font-weight: 700; }
+        [data-composition-id="__ID__"] .us { font-size: 40px; color: #d4e6a5; margin-top: 4px; }
+      </style>
+      <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
+        <div class="cal" id="__ID__-cal"><div class="cal-top"></div>
+          <div class="hoja"><div class="hoy" id="__ID__-hoy"></div></div>
+          <div class="hoja" id="__ID__-vieja"><div class="viejo" id="__ID__-viejo"></div></div>
+        </div>
+        <div class="pide" id="__ID__-pide"></div>
+        <div class="firma" id="__ID__-firma"><img class="masc" id="__ID__-masc" src="public/mascota.png" alt="" /><div><div class="fn" id="__ID__-fn"></div><div class="us" id="__ID__-us"></div></div></div>
+      </div>
+      <script>
+        (function () {
+          const ID = "__ID__";
+          const $ = (k) => document.getElementById(ID + "-" + k);
+          const v = window.__hyperframes.getVariables();
+          $("viejo").textContent = v.sello_repetido || "";
+          $("hoy").textContent = v.sello_final || "";
+          // Las palabras SIEMPRE dentro de la hoja (500 px): letra según su longitud (calculada, determinista).
+          const cabe = (t, ancho, max, k) => Math.min(max, Math.floor(ancho / (Math.max(1, Array.from(String(t)).length) * k)));
+          $("viejo").style.fontSize = cabe(v.sello_repetido || "", 360, 78, 0.8) + "px";
+          $("hoy").style.fontSize = cabe(v.sello_final || "", 440, 170, 0.74) + "px";
+          $("pide").textContent = v.pedir_compartir || "";
+          $("fn").textContent = v.firma || ""; $("us").textContent = v.usuario || "";
+          if (v.mascota) $("masc").src = v.mascota; else $("masc").style.display = "none";
+          const t2 = Number(v.t2) || 3.4;
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo($("cal"), { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.6)" }, 0.1);
+          // Se arranca «MAÑANA» y queda «HOY» (vuelve la imagen del gancho, ahora resuelta).
+          tl.fromTo($("vieja"), { rotation: 0, y: 0, opacity: 1 }, { rotation: -16, y: 900, opacity: 0, duration: 0.9, ease: "power2.in" }, 0.8);
+          tl.fromTo($("hoy"), { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.55, ease: "back.out(2.4)" }, 1.25);
+          tl.fromTo($("pide"), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 1.6);
+          // Firma con la llamada a seguir.
+          tl.fromTo($("firma"), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, Math.max(2.2, t2 - 0.2));
+          tl.fromTo($("masc"), { rotation: -8 }, { rotation: 8, duration: 0.6, yoyo: true, repeat: 3, ease: "sine.inOut", transformOrigin: "50% 100%" }, Math.max(2.4, t2));
+          window.__timelines[ID] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

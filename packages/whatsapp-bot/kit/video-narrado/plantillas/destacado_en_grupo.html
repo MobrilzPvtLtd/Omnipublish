@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- PLANTILLA «destacado_en_grupo» · un punto se sale de una fila de iguales; aparecen las objeciones y se desvanecen. -->
+<html
+  data-composition-variables='[
+    {"id":"numero","type":"number","label":"Número de recordatorio (0 = sin número)","default":7},
+    {"id":"etiqueta_grupo","type":"string","label":"Nombre del grupo","default":"lo habitual"},
+    {"id":"objeciones_0","type":"string","label":"Objeción 1","default":"¿no es demasiado?"},
+    {"id":"objeciones_1","type":"string","label":"Objeción 2","default":"¿para qué?"},
+    {"id":"objeciones_2","type":"string","label":"Objeción 3","default":""},
+    {"id":"remate","type":"string","label":"Frase final","default":"No necesitas que todos lo entiendan"},
+    {"id":"t1","type":"number","label":"Inicio frase 2 (s)","default":3.6},
+    {"id":"t2","type":"number","label":"Inicio última frase (s)","default":3.6},
+    {"id":"dur","type":"number","label":"Duración escena (s)","default":8}
+  ]'
+>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        @font-face { font-family: "Jost"; src: url("public/fonts/Jost-var.ttf") format("truetype"); font-weight: 100 900; }
+        #root[data-composition-id="__ID__"] { position: absolute; inset: 0; font-family: "Jost", sans-serif; color: #fff; }
+        [data-composition-id="__ID__"] .kicker { position: absolute; left: 96px; top: 300px; font-size: 34px; font-weight: 600; letter-spacing: .14em; color: #d4e6a5; }
+        [data-composition-id="__ID__"] .grupo { position: absolute; left: 96px; right: 96px; top: 420px; height: 760px; }
+        [data-composition-id="__ID__"] .etq { position: absolute; left: 0; top: 0; font-size: 32px; color: #6a706b; letter-spacing: .08em; text-transform: uppercase; }
+        [data-composition-id="__ID__"] .d { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: #3a3f3b; display: block; }
+        [data-composition-id="__ID__"] .yo { background: #d4e6a5; box-shadow: 0 0 40px rgba(212,230,165,.55); }
+        [data-composition-id="__ID__"] .obj { position: absolute; padding: 14px 26px; border-radius: 26px; background: #262a27; color: #c9ccc9; font-size: 36px; white-space: nowrap; }
+        [data-composition-id="__ID__"] .remate { position: absolute; left: 96px; right: 96px; top: 1250px; font-size: 66px; font-weight: 600; line-height: 1.12; }
+      </style>
+      <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
+        <div class="kicker" id="__ID__-kicker"></div>
+        <div class="grupo" id="__ID__-grupo"><div class="etq" id="__ID__-etq"></div></div>
+        <div class="remate" id="__ID__-remate"></div>
+      </div>
+      <script>
+        (function () {
+          const ID = "__ID__";
+          const $ = (k) => document.getElementById(ID + "-" + k);
+          const v = window.__hyperframes.getVariables();
+          const n = Number(v.numero) || 0;
+          $("kicker").textContent = n ? "RECORDATORIO " + String(n).padStart(2, "0") : "";
+          $("etq").textContent = v.etiqueta_grupo || "";
+          $("remate").textContent = v.remate || "";
+          const g = $("grupo"), COLS = 7, FILAS = 6, PASO = 120;
+          let yo = null;
+          for (let f = 0; f < FILAS; f++) for (let c = 0; c < COLS; c++) {
+            const d = document.createElement("div"); d.className = "d";
+            d.style.left = c * PASO + 20 + "px"; d.style.top = f * PASO + 90 + "px";
+            g.appendChild(d);
+            if (f === 2 && c === 3) yo = d;
+          }
+          const obs = [v.objeciones_0, v.objeciones_1, v.objeciones_2, v.objeciones_3].filter((x) => x && String(x).trim());
+          const pos = [[40, 250], [430, 470], [120, 620]];
+          const burbujas = obs.slice(0, 3).map((t, i) => { const b = document.createElement("div"); b.className = "obj"; b.textContent = t; b.style.left = pos[i][0] + "px"; b.style.top = pos[i][1] + "px"; g.appendChild(b); return b; });
+          const t1 = Number(v.t1) || 3.6, t2 = Math.max(t1, Number(v.t2) || 3.6);
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo($("kicker"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.05);
+          tl.fromTo(g.querySelectorAll(".d"), { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.012, ease: "back.out(2)" }, 0.15);
+          tl.fromTo($("etq"), { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.4);
+          // Uno se enciende y se sale de la fila.
+          tl.fromTo(yo, { backgroundColor: "#3a3f3b", boxShadow: "0 0 0 rgba(212,230,165,0)" }, { backgroundColor: "#d4e6a5", boxShadow: "0 0 40px rgba(212,230,165,.55)", duration: 0.4 }, 1.1);
+          tl.fromTo(yo, { x: 0, y: 0, scale: 1 }, { x: 330, y: -60, scale: 1.5, duration: 1.1, ease: "power3.inOut" }, 1.5);
+          // Las objeciones aparecen alrededor… y se desvanecen sin pararlo.
+          burbujas.forEach((b, i) => tl.fromTo(b, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "back.out(2)" }, Math.max(1.9, t1 - 1.2) + i * 0.45));
+          if (burbujas.length) tl.to(burbujas, { opacity: 0, y: -14, duration: 0.5, stagger: 0.08 }, t2 - 0.2);
+          tl.to(yo, { x: 420, y: -320, duration: 1.2, ease: "power2.inOut" }, t2 - 0.2);
+          tl.fromTo($("remate"), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, t2);
+          window.__timelines[ID] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- PLANTILLA «contador» · un número que cambia el sentido (intentos, personas…).
+     El generador sustituye __ID__ por el id único de la escena y pasa los valores con data-variable-values. -->
+<html
+  data-composition-variables='[
+    {"id":"numero","type":"number","label":"Número de recordatorio (0 = sin número)","default":2},
+    {"id":"desde","type":"number","label":"Contador desde","default":1},
+    {"id":"hasta","type":"number","label":"Contador hasta","default":213},
+    {"id":"etiqueta","type":"string","label":"Qué cuenta","default":"intentos que no ves"},
+    {"id":"destacado","type":"string","label":"Palabra bajo el número (opcional)","default":""},
+    {"id":"remate","type":"string","label":"Frase final","default":"Date más intentos"},
+    {"id":"t1","type":"number","label":"Inicio frase 2 (s)","default":2.2},
+    {"id":"t2","type":"number","label":"Inicio última frase (s)","default":4.6},
+    {"id":"dur","type":"number","label":"Duración escena (s)","default":7}
+  ]'
+>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        @font-face { font-family: "Jost"; src: url("public/fonts/Jost-var.ttf") format("truetype"); font-weight: 100 900; }
+        #root[data-composition-id="__ID__"] { position: absolute; inset: 0; font-family: "Jost", sans-serif; color: #fff; }
+        [data-composition-id="__ID__"] .kicker { position: absolute; left: 96px; top: 300px; font-size: 34px; font-weight: 600; letter-spacing: .14em; color: #d4e6a5; }
+        [data-composition-id="__ID__"] .escena { position: absolute; left: 96px; right: 96px; top: 420px; height: 780px; }
+        [data-composition-id="__ID__"] .puntos { position: absolute; inset: 0; }
+        [data-composition-id="__ID__"] .p { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: #262a27; }
+        [data-composition-id="__ID__"] .centro { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        [data-composition-id="__ID__"] .num { font-size: 300px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.04em; text-shadow: 0 0 60px #111312, 0 0 30px #111312; }
+        [data-composition-id="__ID__"] .etq { margin-top: 18px; font-size: 46px; font-weight: 500; color: #c9ccc9; text-align: center; max-width: 820px; text-shadow: 0 0 24px #111312; }
+        [data-composition-id="__ID__"] .dest { margin-top: 10px; font-size: 96px; font-weight: 700; color: #d4e6a5; }
+        [data-composition-id="__ID__"] .remate { position: absolute; left: 96px; right: 96px; top: 1250px; font-size: 66px; font-weight: 600; line-height: 1.12; }
+      </style>
+      <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
+        <div class="kicker" id="__ID__-kicker">RECORDATORIO</div>
+        <div class="escena">
+          <div class="puntos" id="__ID__-puntos"></div>
+          <div class="centro">
+            <div class="num" id="__ID__-num">0</div>
+            <div class="etq" id="__ID__-etq"></div>
+            <div class="dest" id="__ID__-dest"></div>
+          </div>
+        </div>
+        <div class="remate" id="__ID__-remate"></div>
+      </div>
+      <script>
+        (function () {
+          const ID = "__ID__";
+          const $ = (k) => document.getElementById(ID + "-" + k);
+          const v = window.__hyperframes.getVariables();
+          const n = Number(v.numero) || 0;
+          $("kicker").textContent = n ? "RECORDATORIO " + String(n).padStart(2, "0") : "";
+          $("etq").textContent = v.etiqueta || "";
+          $("dest").textContent = v.destacado || "";
+          $("remate").textContent = v.remate || "";
+          // Rejilla de puntos = los intentos que no se ven (determinista, sin azar).
+          const caja = $("puntos"), cols = 12, filas = 18, total = cols * filas;
+          for (let i = 0; i < total; i++) {
+            const d = document.createElement("div");
+            d.className = "p";
+            d.style.left = (i % cols) * 74 + 18 + "px";
+            d.style.top = Math.floor(i / cols) * 43 + 6 + "px";
+            caja.appendChild(d);
+          }
+          const desde = Number(v.desde) || 0, hasta = Number(v.hasta) || 0;
+          // t1 = cuando se dice el número (ancla); t2 = remate. Sin hueco entre los dos (escena de 2 frases sin
+          // ancla), cuenta durante la 1.ª frase: un número quieto mientras la voz ya lo dice no cuadra.
+          const t2 = Number(v.t2) || 4.5, t1 = Number(v.t1) && Number(v.t1) < t2 - 0.8 ? Number(v.t1) : 0.9;
+          const num = $("num"), obj = { n: desde };
+          num.textContent = String(desde);
+          const puntos = Array.prototype.slice.call(caja.children, 0, Math.min(total, Math.max(1, Math.round(total * Math.min(1, hasta / 250)))));
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo($("kicker"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.05);
+          // Muchos: el número entra justo cuando empieza a contar (antes solo la rejilla), nunca un «1» quieto
+          // mientras la voz habla de otra cosa. Pocos (0→1): el 0 sí se ve desde el principio (es el mensaje).
+          const muchos = Math.abs(hasta - desde) > 3, tNum = muchos ? Math.max(0.15, t1 - 0.3) : 0.15;
+          tl.fromTo(num, { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, tNum);
+          tl.fromTo($("etq"), { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, tNum + 0.3);
+          if (muchos) {
+            // Muchos: cuenta visible desde la 2.ª frase, rápida al principio y frenando al llegar.
+            tl.fromTo(obj, { n: desde }, { n: hasta, duration: Math.max(1.2, t2 - t1 - 0.3), ease: "power1.out", onUpdate: () => { num.textContent = String(Math.round(obj.n)); } }, t1);
+            tl.fromTo(puntos, { backgroundColor: "#262a27" }, { backgroundColor: "#56604a", duration: 0.25, stagger: Math.max(0.002, (t2 - t1 - 0.5) / puntos.length) }, t1);
+          } else {
+            // Pocos (0→1): un salto marcado cuando se dice el número (ancla t1) o, sin ancla, antes del remate.
+            const ts = t1 > 0.9 ? t1 + 0.2 : t2 - 0.37;
+            tl.to(num, { scale: 0.7, opacity: 0.4, duration: 0.18, ease: "power2.in" }, ts - 0.18);
+            // Cambio de número seguro al saltar (seek): una animación de valor, no un tl.call.
+            tl.fromTo(obj, { n: desde }, { n: hasta, duration: 0.02, onUpdate: () => { num.textContent = String(Math.round(obj.n)); } }, ts);
+            tl.to(num, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(3)" }, ts + 0.01);
+            tl.fromTo(puntos[0], { backgroundColor: "#262a27", scale: 1 }, { backgroundColor: "#d4e6a5", scale: 2.2, duration: 0.5, ease: "back.out(3)" }, ts + 0.01);
+          }
+          if ($("dest").textContent) tl.fromTo($("dest"), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "back.out(2)" }, t2 - 0.35);
+          tl.fromTo(num, { color: "#ffffff" }, { color: "#d4e6a5", duration: 0.4 }, t2 - 0.25);
+          tl.fromTo($("remate"), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, t2);
+          window.__timelines[ID] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- PLANTILLA «carrera» · lo que parece ganar (sale con ventaja y se para) frente a lo que de verdad gana. -->
+<html
+  data-composition-variables='[
+    {"id":"numero","type":"number","label":"Número de recordatorio (0 = sin número)","default":3},
+    {"id":"lento_etiqueta","type":"string","label":"El que parece ganar","default":"TALENTO"},
+    {"id":"rapido_etiqueta","type":"string","label":"El que gana","default":"EMPEZAR"},
+    {"id":"remate","type":"string","label":"Frase final","default":"Lo que sabes solo cuenta si lo usas"},
+    {"id":"t1","type":"number","label":"Inicio frase 2 (s)","default":3.5},
+    {"id":"t2","type":"number","label":"Inicio última frase (s)","default":3.5},
+    {"id":"dur","type":"number","label":"Duración escena (s)","default":8}
+  ]'
+>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        @font-face { font-family: "Jost"; src: url("public/fonts/Jost-var.ttf") format("truetype"); font-weight: 100 900; }
+        #root[data-composition-id="__ID__"] { position: absolute; inset: 0; font-family: "Jost", sans-serif; color: #fff; }
+        [data-composition-id="__ID__"] .kicker { position: absolute; left: 96px; top: 300px; font-size: 34px; font-weight: 600; letter-spacing: .14em; color: #d4e6a5; }
+        [data-composition-id="__ID__"] .pista { position: absolute; left: 96px; right: 96px; height: 200px; }
+        [data-composition-id="__ID__"] .p1 { top: 470px; }
+        [data-composition-id="__ID__"] .p2 { top: 760px; }
+        [data-composition-id="__ID__"] .nom { font-size: 56px; font-weight: 700; letter-spacing: .02em; }
+        [data-composition-id="__ID__"] .riel { position: absolute; left: 0; right: 0; top: 96px; height: 56px; border-radius: 28px; background: #1d211e; overflow: hidden; }
+        [data-composition-id="__ID__"] .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 28px; transform-origin: 0% 50%; }
+        [data-composition-id="__ID__"] .f1 { background: #5c625d; }
+        [data-composition-id="__ID__"] .f2 { background: #d4e6a5; }
+        [data-composition-id="__ID__"] .meta { position: absolute; right: 96px; top: 430px; width: 8px; height: 590px; background: repeating-linear-gradient(180deg, #fff 0 20px, transparent 20px 40px); opacity: .6; }
+        [data-composition-id="__ID__"] .stop { position: absolute; left: 0; top: 176px; font-size: 30px; color: #9a9e9a; }
+        [data-composition-id="__ID__"] .remate { position: absolute; left: 96px; right: 96px; top: 1250px; font-size: 66px; font-weight: 600; line-height: 1.12; }
+      </style>
+      <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
+        <div class="kicker" id="__ID__-kicker"></div>
+        <div class="meta" id="__ID__-meta"></div>
+        <div class="pista p1" id="__ID__-p1"><div class="nom" id="__ID__-n1"></div><div class="riel"><div class="fill f1" id="__ID__-f1"></div></div><div class="stop" id="__ID__-stop">se queda esperando</div></div>
+        <div class="pista p2" id="__ID__-p2"><div class="nom" id="__ID__-n2"></div><div class="riel"><div class="fill f2" id="__ID__-f2"></div></div></div>
+        <div class="remate" id="__ID__-remate"></div>
+      </div>
+      <script>
+        (function () {
+          const ID = "__ID__";
+          const $ = (k) => document.getElementById(ID + "-" + k);
+          const v = window.__hyperframes.getVariables();
+          const n = Number(v.numero) || 0;
+          $("kicker").textContent = n ? "RECORDATORIO " + String(n).padStart(2, "0") : "";
+          $("n1").textContent = v.lento_etiqueta || ""; $("n2").textContent = v.rapido_etiqueta || "";
+          $("remate").textContent = v.remate || "";
+          const t2 = Number(v.t2) || 3.5, dur = Number(v.dur) || 8;
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo($("kicker"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.05);
+          tl.fromTo([$("p1"), $("p2"), $("meta")], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: "power3.out" }, 0.15);
+          // El que parece ganar sale con ventaja… y se para.
+          tl.fromTo($("f1"), { scaleX: 0.02 }, { scaleX: 0.46, duration: 0.9, ease: "power3.out" }, 0.5);
+          tl.fromTo($("stop"), { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.6);
+          // El que empieza parte de cero, acelera y lo adelanta antes del remate.
+          tl.fromTo($("f2"), { scaleX: 0.02 }, { scaleX: 0.96, duration: Math.max(1.6, t2 - 0.9), ease: "power2.in" }, 0.9);
+          tl.fromTo($("n2"), { color: "#ffffff" }, { color: "#d4e6a5", duration: 0.3 }, Math.max(1.4, t2 - 0.4));
+          tl.fromTo($("remate"), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, t2);
+          window.__timelines[ID] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

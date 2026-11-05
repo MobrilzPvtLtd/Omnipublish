@@ -1,0 +1,61 @@
+<!doctype html>
+<!-- PLANTILLA «repeticion_excepcion» · algo repetido mil veces (lista sin fin) frente a la única excepción que se ilumina. -->
+<html
+  data-composition-variables='[
+    {"id":"numero","type":"number","label":"Número de recordatorio (0 = sin número)","default":4},
+    {"id":"frase_repetida","type":"string","label":"Lo que se repite","default":"¿y si sale mal?"},
+    {"id":"frase_destacada","type":"string","label":"La excepción","default":"¿y si sale bien?"},
+    {"id":"t1","type":"number","label":"Inicio frase 2 (s)","default":3.2},
+    {"id":"t2","type":"number","label":"Inicio última frase (s)","default":3.2},
+    {"id":"dur","type":"number","label":"Duración escena (s)","default":7}
+  ]'
+>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        @font-face { font-family: "Jost"; src: url("public/fonts/Jost-var.ttf") format("truetype"); font-weight: 100 900; }
+        #root[data-composition-id="__ID__"] { position: absolute; inset: 0; font-family: "Jost", sans-serif; color: #fff; }
+        [data-composition-id="__ID__"] .kicker { position: absolute; left: 96px; top: 300px; font-size: 34px; font-weight: 600; letter-spacing: .14em; color: #d4e6a5; }
+        [data-composition-id="__ID__"] .ventana { position: absolute; left: 96px; right: 96px; top: 400px; height: 820px; overflow: hidden;
+          -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%); }
+        [data-composition-id="__ID__"] .lista { position: absolute; left: 0; right: 0; top: 0; }
+        [data-composition-id="__ID__"] .fila { height: 82px; display: flex; align-items: center; font-size: 52px; font-weight: 500; color: #4c524d; white-space: nowrap; }
+        [data-composition-id="__ID__"] .fila .n { width: 120px; font-size: 30px; color: #3a3f3b; font-variant-numeric: tabular-nums; }
+        [data-composition-id="__ID__"] .clave { position: absolute; left: 0; right: 0; top: 369px; height: 82px; display: flex; align-items: center; font-size: 76px; font-weight: 700; color: #d4e6a5; white-space: nowrap; }
+        [data-composition-id="__ID__"] .clave .n { width: 120px; font-size: 30px; color: #d4e6a5; }
+      </style>
+      <div id="root" data-composition-id="__ID__" data-width="1080" data-height="1920">
+        <div class="kicker" id="__ID__-kicker"></div>
+        <div class="ventana"><div class="lista" id="__ID__-lista"></div><div class="clave" id="__ID__-clave"><span class="n">1</span><span id="__ID__-ctxt"></span></div></div>
+      </div>
+      <script>
+        (function () {
+          const ID = "__ID__";
+          const $ = (k) => document.getElementById(ID + "-" + k);
+          const v = window.__hyperframes.getVariables();
+          const n = Number(v.numero) || 0;
+          $("kicker").textContent = n ? "RECORDATORIO " + String(n).padStart(2, "0") : "";
+          $("ctxt").textContent = v.frase_destacada || "";
+          const FILAS = 40, H = 82, lista = $("lista");
+          for (let i = 0; i < FILAS; i++) {
+            const f = document.createElement("div"); f.className = "fila";
+            const num = document.createElement("span"); num.className = "n"; num.textContent = String(999 - (FILAS - 1 - i) * 3);
+            const tx = document.createElement("span"); tx.textContent = v.frase_repetida || "";
+            f.appendChild(num); f.appendChild(tx); lista.appendChild(f);
+          }
+          const t2 = Number(v.t2) || 3.2;
+          // Para al acabar: la última fila (999) queda en el centro, donde aparece la excepción.
+          const finY = -(FILAS - 1) * H + 369, iniY = 369 - 6 * H;
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo($("kicker"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.05);
+          tl.fromTo(lista, { y: iniY }, { y: finY, duration: Math.max(1.5, t2 - 0.4), ease: "power2.inOut" }, 0.2);
+          // La excepción: las repeticiones se apagan y una sola línea se ilumina.
+          tl.to(lista, { opacity: 0.07, duration: 0.5 }, t2 - 0.2); // casi fuera: la excepción se lee limpia
+          tl.fromTo($("clave"), { opacity: 0, scale: 0.9, transformOrigin: "0% 50%" }, { opacity: 1, scale: 1, duration: 0.55, ease: "back.out(2)" }, t2);
+          window.__timelines[ID] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
